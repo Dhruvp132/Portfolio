@@ -1,67 +1,76 @@
-'use client'
+'use client';
 
 import Link from 'next/link';
-import { useEffect, useRef } from 'react'
-import { motion, useScroll, useTransform } from 'framer-motion'
-import { Github, Linkedin, Mail, Phone } from 'lucide-react'
+import { useEffect, useRef } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { Github, Linkedin, Mail, Phone } from 'lucide-react';
+
+// Define a custom interface to extend HTMLDivElement with x and y properties
+interface CustomDivElement extends HTMLDivElement {
+  x: number;
+  y: number;
+}
 
 const colors = [
   "#ffb56b", "#fdaf69", "#f89d63", "#f59761", "#ef865e", "#ec805d", "#e36e5c",
   "#df685c", "#d5585c", "#d1525c", "#c5415d", "#c03b5d", "#b22c5e", "#ac265e",
   "#9c155f", "#950f5f", "#830060", "#7c0060", "#680060", "#60005f", "#48005f", "#3d005e"
-]
+];
 
 export default function Portfolio() {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const circlesRef = useRef<(HTMLDivElement | null)[]>([])
-  const coordsRef = useRef({ x: 0, y: 0 })
+  const containerRef = useRef<HTMLDivElement>(null);
+  const circlesRef = useRef<(CustomDivElement | null)[]>([]);
+  const coordsRef = useRef({ x: 0, y: 0 });
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end start"]
-  })
+  });
 
-  const y = useTransform(scrollYProgress, [0, 1], ["0%", "50%"])
+  const y = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
 
   useEffect(() => {
-    const circles = circlesRef.current.filter((circle): circle is HTMLDivElement => circle !== null)
+    // Filter out nulls and ensure circles are of type CustomDivElement
+    const circles = circlesRef.current.filter(
+      (circle): circle is CustomDivElement => circle !== null
+    );
 
     circles.forEach((circle, index) => {
-      circle.x = 0
-      circle.y = 0
-      circle.style.backgroundColor = colors[index % colors.length]
-    })
+      circle.x = 0;
+      circle.y = 0;
+      circle.style.backgroundColor = colors[index % colors.length];
+    });
 
     const handleMouseMove = (e: MouseEvent) => {
-      coordsRef.current = { x: e.clientX, y: e.clientY }
-    }
+      coordsRef.current = { x: e.clientX, y: e.clientY };
+    };
 
-    window.addEventListener("mousemove", handleMouseMove)
+    window.addEventListener("mousemove", handleMouseMove);
 
     function animateCircles() {
-      let x = coordsRef.current.x
-      let y = coordsRef.current.y
+      let x = coordsRef.current.x;
+      let y = coordsRef.current.y;
 
       circles.forEach((circle, index) => {
-        circle.style.left = `${x - 12}px`
-        circle.style.top = `${y - 12}px`
-        circle.style.scale = `${(circles.length - index) / circles.length}`
-        circle.x = x
-        circle.y = y
+        circle.style.left = `${x - 12}px`;
+        circle.style.top = `${y - 12}px`;
+        circle.style.transform = `scale(${(circles.length - index) / circles.length})`;
+        circle.x = x;
+        circle.y = y;
 
-        const nextCircle = circles[index + 1] || circles[0]
-        x += (nextCircle.x - x) * 0.3
-        y += (nextCircle.y - y) * 0.3
-      })
+        const nextCircle = circles[index + 1] || circles[0];
+        x += (nextCircle.x - x) * 0.3;
+        y += (nextCircle.y - y) * 0.3;
+      });
 
-      requestAnimationFrame(animateCircles)
+      requestAnimationFrame(animateCircles);
     }
 
-    animateCircles()
+    animateCircles();
 
     return () => {
-      window.removeEventListener("mousemove", handleMouseMove)
-    }
-  }, [])
+      window.removeEventListener("mousemove", handleMouseMove);
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-900 text-white overflow-hidden" ref={containerRef}>
@@ -77,7 +86,7 @@ export default function Portfolio() {
       {Array.from({ length: 20 }).map((_, index) => (
         <div
           key={index}
-          ref={el => circlesRef.current[index] = el}
+          ref={el => { circlesRef.current[index] = el && null; }} // Adjusted ref callback
           className="circle"
         />
       ))}
@@ -107,19 +116,19 @@ export default function Portfolio() {
             <h2 className="text-4xl font-bold mb-4">Welcome to My Portfolio</h2>
             <p className="text-xl">Full-stack Developer | Software Engineer | Problem Solver | Innovator</p>
             <div className="flex mt-7 justify-center space-x-4">
-          <a href="https://www.linkedin.com/in/dhruvpatel1310" target="_blank" rel="noopener noreferrer">
-            <Linkedin className="w-6 h-6" />
-          </a>
-          <a href="https://github.com/Dhruvp132" target="_blank" rel="noopener noreferrer">
-            <Github className="w-6 h-6" />
-          </a>
-          <a href="mailto:dhruvpatel13210@gmail.com">
-            <Mail className="w-6 h-6" />
-          </a>
-          <a href="tel:+919589482345">
-            <Phone className="w-6 h-6" />
-          </a>
-        </div>
+              <a href="https://www.linkedin.com/in/dhruvpatel1310" target="_blank" rel="noopener noreferrer">
+                <Linkedin className="w-6 h-6" />
+              </a>
+              <a href="https://github.com/Dhruvp132" target="_blank" rel="noopener noreferrer">
+                <Github className="w-6 h-6" />
+              </a>
+              <a href="mailto:dhruvpatel13210@gmail.com">
+                <Mail className="w-6 h-6" />
+              </a>
+              <a href="tel:+919589482345">
+                <Phone className="w-6 h-6" />
+              </a>
+            </div>
           </motion.div>
         </section>
 
@@ -170,21 +179,20 @@ export default function Portfolio() {
             <h2 className="text-3xl font-bold mb-8">Projects</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {[
-                { name: 'Muzique', desc: 'Collaborative SaaS music platform', link : "https://github.com/Dhruvp132/Muzique" },
-                { name: 'Progressify', desc: 'Task management system with admin dashboard', link : 'https://dhruvp132.github.io/Progressify/' },
-                { name: 'AlgoViz', desc: 'Educational tool for visualizing algorithms', link : 'https://dhruvp132.github.io/Pathfinding-Visualizer/' }
+                { name: 'Muzique', desc: 'Collaborative SaaS music platform', link: "https://github.com/Dhruvp132/Muzique" },
+                { name: 'Progressify', desc: 'Task management system with admin dashboard', link: 'https://dhruvp132.github.io/Progressify/' },
+                { name: 'AlgoViz', desc: 'Educational tool for visualizing algorithms', link: 'https://dhruvp132.github.io/Pathfinding-Visualizer/' }
               ].map((project, index) => (
                 <Link key={project.name} href={project.link || '#'} passHref>
-                <motion.div
-                  key={project.name}
-                  className="bg-gray-700 p-6 rounded-lg"
-                  initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.2 }}
-                >
-                  <h3 className="text-2xl font-semibold mb-2">{project.name}</h3>
-                  <p>{project.desc}</p>
-                </motion.div>
+                  <motion.a
+                    className="bg-gray-700 p-6 rounded-lg block"
+                    initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5, delay: index * 0.2 }}
+                  >
+                    <h3 className="text-2xl font-semibold mb-2">{project.name}</h3>
+                    <p>{project.desc}</p>
+                  </motion.a>
                 </Link>
               ))}
             </div>
@@ -200,7 +208,7 @@ export default function Portfolio() {
               transition={{ duration: 0.5 }}
             >
               <h3 className="text-2xl font-semibold">Bachelor of Technology (BTech)</h3>
-              <p className="text-gray-400">Silver Oak University, Ahmedabad, Gujarat | Grad' 2024</p>
+              <p className="text-gray-400">Silver Oak University, Ahmedabad, Gujarat | Grad&apos; 2024</p> {/* Escaped apostrophe */}
               <p className="mt-2">Computer Science Engineering | CGPA: 9.28</p>
             </motion.div>
           </div>
@@ -250,5 +258,5 @@ export default function Portfolio() {
         }
       `}</style>
     </div>
-  )
+  );
 }
