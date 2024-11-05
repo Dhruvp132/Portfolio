@@ -1,0 +1,90 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+// User Data
+model User {
+  id            String          @id @default(uuid())
+  name          String          @default("Dhruv Patel")
+  experiences   Experience[]    @relation("userExperience")
+  educations    Education[]     @relation("userEducation")
+  skills        Skill[]         @relation("userSkill")
+  projects      Project[]       @relation("userProject")
+  achievements  Achievement[]   @relation("userAchievement")
+  certifications Certification[] @relation("userCertification")
+}
+
+model Experience {
+  id           String   @id @default(cuid())
+  from         String   
+  to           String
+  jobTitle     String
+  company      String
+  location     String
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], name: "userExperience")
+}
+
+model Education {
+  id           String   @id @default(cuid())
+  userId       String
+  schoolName   String
+  from         String
+  to           String
+  courseWork   String
+  honors       String?
+  user         User     @relation(fields: [userId], references: [id], name: "userEducation")
+}
+
+model Achievement {
+  id           String   @id @default(cuid())
+  userId       String
+  name         String
+  description  String
+  link         String?
+  user         User     @relation(fields: [userId], references: [id], name: "userAchievement")
+}
+
+model Certification {
+  id           String   @id @default(cuid())
+  userId       String
+  name         String
+  description  String
+  link         String?
+  user         User     @relation(fields: [userId], references: [id], name: "userCertification")
+}
+
+model Skill {
+  id           String   @id @default(cuid())
+  userId       String
+  name         String
+  subDescription String
+  user         User     @relation(fields: [userId], references: [id], name: "userSkill")
+}
+
+model Project {
+  id           String   @id @default(cuid())
+  userId       String
+  name         String
+  description  String
+  duration     String
+  user         User     @relation(fields: [userId], references: [id], name: "userProject")
+  descriptions ProjectDescription[]
+}
+
+model ProjectDescription {
+  id           String   @id @default(cuid())
+  projectId    String
+  points       String
+  project      Project  @relation(fields: [projectId], references: [id])
+}
