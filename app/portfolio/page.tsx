@@ -86,7 +86,7 @@ export default function Portfolio() {
       {Array.from({ length: 20 }).map((_, index) => (
         <div
           key={index}
-          ref={el => { circlesRef.current[index] = el && null; }} // Adjusted ref callback
+          ref={el => { circlesRef.current[index] = el; }}
           className="circle"
         />
       ))}
